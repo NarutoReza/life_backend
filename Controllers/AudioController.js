@@ -32,7 +32,6 @@ function generateFilename(originalname) {
   const minute = String(now.getMinutes()).padStart(2, "0");
   const second = String(now.getSeconds()).padStart(2, "0");
   const ext = path.extname(originalname) || "";
-  // Example: "ChatGPT Video 2025-03-31_19-51-40.png"
   return `${year}-${month}-${day}_${hour}-${minute}-${second}${ext}`;
 }
 
@@ -119,7 +118,6 @@ exports.getAudio = async (req, res) => {
 
     const readStream = gridfsBucket.openDownloadStream(fileId);
 
-    // Attach event listeners for debugging purposes.
     readStream.on("data", (chunk) => {
       console.log("Streaming chunk of size:", chunk.length);
     });
@@ -131,13 +129,11 @@ exports.getAudio = async (req, res) => {
     });
     readStream.on("error", (streamError) => {
       console.error("Download stream error:", streamError);
-      // Ensure that if an error occurs, you send a response if it hasn't been sent already.
       if (!res.headersSent) {
         return res.status(500).json({ message: "Error retrieving file", error: streamError });
       }
     });
 
-    // Set the Content-Type header from file metadata and pipe the stream to the response.
     res.set("Content-Type", file.contentType);
     readStream.pipe(res);
   } catch (error) {

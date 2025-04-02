@@ -6,7 +6,7 @@ require('dotenv').config();
 const app = express();
 const cors = require('cors');
 app.use(cors({
-  origin: '*', // Allow all origins (or specify the frontend URL)
+  origin: '*',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
@@ -50,7 +50,6 @@ conn.once('open', () => {
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-// Upload file route
 app.post('/upload', upload.single('file'), (req, res) => {
   const file = req.file;
 
