@@ -10,7 +10,11 @@ require('dotenv').config();
 const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
-app.use(cors());
+app.use(cors({
+  origin: '*', // Allow all origins (or specify the frontend URL)
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['Content-Type'],
+}));
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));

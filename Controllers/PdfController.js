@@ -83,6 +83,11 @@ exports.addPdf = [
 exports.getPdf = async (req, res) => {
   const {name} = req.body;
   try {
+    if (!gridfsBucket) {
+      console.error("GridFS is not initialized yet. Retrying...");
+      return res.status(503).json({ message: "GridFS not initialized. Please retry." });
+    }
+    
     if (!name) {
       return res.status(405).json({message: "Some input fields are missing."});
     }
@@ -115,20 +120,20 @@ exports.getPdf = async (req, res) => {
       .find({ files_id: fileId })
       .toArray();
 
-    console.log(chunks.length);
+    // console.log(chunks.length);
 
     const readStream = gridfsBucket.openDownloadStream(fileId);
 
     // Attach event listeners for debugging purposes.
-    readStream.on("data", (chunk) => {
-      console.log("Streaming chunk of size:", chunk.length);
-    });
-    readStream.on("end", () => {
-      console.log("Download stream ended");
-    });
-    readStream.on("close", () => {
-      console.log("Download stream closed");
-    });
+    // readStream.on("data", (chunk) => {
+    //   console.log("Streaming chunk of size:", chunk.length);
+    // });
+    // readStream.on("end", () => {
+    //   console.log("Download stream ended");
+    // });
+    // readStream.on("close", () => {
+    //   console.log("Download stream closed");
+    // });
     readStream.on("error", (streamError) => {
       console.error("Download stream error:", streamError);
       // Ensure that if an error occurs, you send a response if it hasn't been sent already.
