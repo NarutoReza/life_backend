@@ -1,13 +1,8 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const multer = require('multer');
-const { GridFSBucket } = require('mongodb');
 const Grid = require('gridfs-stream');
-const path = require('path');
-const crypto = require('crypto');
-const fs = require('fs');
 require('dotenv').config();
-const bodyParser = require('body-parser');
 const app = express();
 const cors = require('cors');
 app.use(cors({
@@ -15,6 +10,7 @@ app.use(cors({
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type'],
 }));
+app.options('*', cors());
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -26,7 +22,7 @@ const audioRouter = require('./Routes/AudioRouter');
 app.use('/api/audio', audioRouter);
 
 const pdfRouter = require('./Routes/PdfRouter');
-app.use('/api/pdf', pdfRouter);
+app.use('/api/some', pdfRouter);
 
 const PORT = process.env.PORT || 8080;
 

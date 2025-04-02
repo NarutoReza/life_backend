@@ -81,7 +81,8 @@ exports.addPdf = [
 ];
 
 exports.getPdf = async (req, res) => {
-  const {name} = req.body;
+  // const {name} = req.body;
+  const name = "pdf";
   try {
     if (!gridfsBucket) {
       console.error("GridFS is not initialized yet. Retrying...");
@@ -145,19 +146,20 @@ exports.getPdf = async (req, res) => {
     // Set the Content-Type header from file metadata and pipe the stream to the response.
     res.set({
       "Content-Type": file.contentType,
-      "Content-Disposition": `inline; filename="${file.filename}"`
+      "Content-Disposition": `inline; filename="${file.filename}"`,
+      "Content-Length": file.length
     });
-    // readStream.pipe(res);
+    readStream.pipe(res);
 
-    const chunks = [];
-    readStream.on("data", (chunk) => {
-      chunks.push(chunk);
-    });
+    // const chunks = [];
+    // readStream.on("data", (chunk) => {
+    //   chunks.push(chunk);
+    // });
 
-    readStream.on("end", () => {
-      const pdfBuffer = Buffer.concat(chunks);
-      res.send(pdfBuffer); // Send the complete file at once
-    });
+    // readStream.on("end", () => {
+    //   const pdfBuffer = Buffer.concat(chunks);
+    //   res.send(pdfBuffer); // Send the complete file at once
+    // });
 
     readStream.on("error", (err) => {
       console.error("Stream error:", err);

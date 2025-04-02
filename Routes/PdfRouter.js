@@ -3,7 +3,7 @@ const router = express.Router();
 
 const {addPdf, getPdf} = require('../Controllers/PdfController');
 
-router.post('/add-pdf', addPdf);
-router.post('/get-pdf', getPdf);
+router.post('/add', addPdf);
+router.get('/get', getPdf);
 
 module.exports = router;
