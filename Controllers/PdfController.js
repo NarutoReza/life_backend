@@ -87,7 +87,7 @@ exports.getPdf = async (req, res) => {
       console.error("GridFS is not initialized yet. Retrying...");
       return res.status(503).json({ message: "GridFS not initialized. Please retry." });
     }
-    
+
     if (!name) {
       return res.status(405).json({message: "Some input fields are missing."});
     }
@@ -115,10 +115,10 @@ exports.getPdf = async (req, res) => {
 
     console.log(file);
 
-    const chunks = await mongoose.connection.db
-      .collection('uploads.chunks')
-      .find({ files_id: fileId })
-      .toArray();
+    // const chunks = await mongoose.connection.db
+    //   .collection('uploads.chunks')
+    //   .find({ files_id: fileId })
+    //   .toArray();
 
     // console.log(chunks.length);
 
@@ -134,17 +134,37 @@ exports.getPdf = async (req, res) => {
     // readStream.on("close", () => {
     //   console.log("Download stream closed");
     // });
-    readStream.on("error", (streamError) => {
-      console.error("Download stream error:", streamError);
-      // Ensure that if an error occurs, you send a response if it hasn't been sent already.
-      if (!res.headersSent) {
-        return res.status(500).json({ message: "Error retrieving file", error: streamError });
-      }
-    });
+    // readStream.on("error", (streamError) => {
+    //   console.error("Download stream error:", streamError);
+    //   // Ensure that if an error occurs, you send a response if it hasn't been sent already.
+    //   if (!res.headersSent) {
+    //     return res.status(500).json({ message: "Error retrieving file", error: streamError });
+    //   }
+    // });
 
     // Set the Content-Type header from file metadata and pipe the stream to the response.
-    res.set("Content-Type", file.contentType);
-    readStream.pipe(res);
+    res.set({
+      "Content-Type": file.contentType,
+      "Content-Disposition": `inline; filename="${file.filename}"`
+    });
+    // readStream.pipe(res);
+
+    const chunks = [];
+    readStream.on("data", (chunk) => {
+      chunks.push(chunk);
+    });
+
+    readStream.on("end", () => {
+      const pdfBuffer = Buffer.concat(chunks);
+      res.send(pdfBuffer); // Send the complete file at once
+    });
+
+    readStream.on("error", (err) => {
+      console.error("Stream error:", err);
+      if (!res.headersSent) {
+        res.status(500).json({ message: "Error retrieving file", error: err });
+      }
+    });
   } catch (error) {
     res.status(400).json({message: "Error retrieving pdf", error});
   }
