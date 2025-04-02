@@ -172,6 +172,12 @@ exports.editAudioFile = async (req, res) => {
       return res.status(405).json({message: "No audio file found."});
     }
 
+    const searchAudio = await Audio.findOne({name});
+
+    if (searchAudio) {
+      return res.status(405).json({message: "An audio file found with the same name. Please change"});
+    }
+
     await Audio.updateOne(
       {_id: audioId},
       {
